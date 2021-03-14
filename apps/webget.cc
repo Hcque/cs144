@@ -21,11 +21,12 @@ void get_URL(const string &host, const string &path) {
     // cerr << "Warning: get_URL() has not been implemented yet.\n";
 
     // transmit
-    TCPSocket s2{};
-    s2.connect(Address(host, "https"));
+    TCPSocket s2;
+    s2.connect(Address(host, "http"));
     s2.write("GET " + path + " HTTP/1.1\r\n"+
     "Host: " + host + "\r\n" +
     "Connection: close\r\n\r\n" );
+    // s2.shutdown(SHUT_WR);
 
     while (1){
         auto rec = s2.read();
