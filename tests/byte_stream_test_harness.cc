@@ -128,6 +128,7 @@ std::string Eof::description() const { return "eof: " + to_string(_eof); }
 void Eof::execute(ByteStream &bs) const {
     auto eof = bs.eof();
     if (eof != _eof) {
+        cout << eof << endl;
         throw ByteStreamExpectationViolation::property("eof", _eof, eof);
     }
 }
