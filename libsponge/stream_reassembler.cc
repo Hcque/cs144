@@ -19,6 +19,15 @@ StreamReassembler::StreamReassembler(const size_t capacity) : _output(capacity),
 //! possibly out-of-order, from the logical stream, and assembles any newly
 //! contiguous substrings and writes them into the output stream in order.
 void StreamReassembler::push_substring(const string &data, const size_t index, const bool eof) {
+    // run out of capcity
+    string data_;
+    if (this->unassembled_bytes() + data.size() > this->_capacity){
+        data_ = data.substr(0, this->_capacity - this->unassembled_bytes());
+        return;
+    }
+    else
+        data_ = data;
+
     if (eof)
         this->eof_idx = index + data.size() ;
     // insert each new data 
@@ -27,20 +36,20 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     list<int> toerase = {};
     for (auto i: this->wait){
         // 'bc' 'bcd'
-        if (i.first == idx && i.second.size() >= data.size()) 
+        if (i.first == idx && i.second.size() >= data_.size()) 
             insert = false;
         // 'bcd' 'c'
-        if (i.first < idx && i.first + i.second.size() >= idx + data.size())
+        if (i.first < idx && i.first + i.second.size() >= idx + data_.size())
             insert = false;
         // 'bcd' 'c'
-        if (i.first > idx && i.first + i.second.size() <= idx + data.size()){
+        if (i.first > idx && i.first + i.second.size() <= idx + data_.size()){
             toerase.push_back(i.first);
         }
     }
     for (auto i : toerase)
         this->wait.erase(i);
     if (insert)
-        this->wait[index] = data;
+        this->wait[index] = data_;
 
     string writebuf = "";
     while (this->wait.size()) {
